@@ -12,9 +12,10 @@ import java.net.URL;
 public class StartingClass extends Applet implements Runnable, KeyListener {
 
     private Robot robot;
-    private Image image, character;
+    private Image image, currentSprite, character, characterDown, characterJumped, background;
     private Graphics second;
     private URL base;
+    private static Background bg1, bg2;
 
     @Override
     public void init() {
@@ -28,35 +29,47 @@ public class StartingClass extends Applet implements Runnable, KeyListener {
         try {
             base = getDocumentBase();
         } catch (Exception e) {
-            // TODO: handle exception
+
         }
 
         // Image Setups
         character = getImage(base, "data/character.png");
-
+        characterDown = getImage(base, "data/down.png");
+        characterJumped = getImage(base, "data/jumped.png");
+        currentSprite = character;
+        background = getImage(base, "data/background.png");
     }
 
     @Override
     public void start() {
+
+        bg1 = new Background(0,0);
+        bg2 = new Background(2160, 0);
         robot = new Robot();
+
         Thread thread = new Thread(this);
         thread.start();
     }
 
     @Override
     public void stop() {
-
     }
 
     @Override
     public void destroy() {
-
     }
 
     @Override
     public void run() {
         while (true) {
             robot.update();
+            if (robot.isJumped()){
+                currentSprite = characterJumped;
+            }else if (robot.isJumped() == false && robot.isDucked() == false){
+                currentSprite = character;
+            }
+            bg1.update();
+            bg2.update();
             repaint();
             try {
                 Thread.sleep(17);
@@ -72,17 +85,22 @@ public class StartingClass extends Applet implements Runnable, KeyListener {
             image = createImage(this.getWidth(), this.getHeight());
             second = image.getGraphics();
         }
+
         second.setColor(getBackground());
         second.fillRect(0, 0, getWidth(), getHeight());
         second.setColor(getForeground());
         paint(second);
 
         g.drawImage(image, 0, 0, this);
+
     }
 
     @Override
     public void paint(Graphics g) {
-        g.drawImage(character, robot.getCenterX() - 61, robot.getCenterY() - 63, this);
+        g.drawImage(background, bg1.getBgX(), bg1.getBgY(), this);
+        g.drawImage(background, bg2.getBgX(), bg2.getBgY(), this);
+        g.drawImage(currentSprite, robot.getCenterX() - 61, robot.getCenterY() - 63, this);
+
     }
 
     @Override
@@ -94,21 +112,29 @@ public class StartingClass extends Applet implements Runnable, KeyListener {
                 break;
 
             case KeyEvent.VK_DOWN:
-                System.out.println("Move down");
+                currentSprite = characterDown;
+                if (robot.isJumped() == false){
+                    robot.setDucked(true);
+                    robot.setSpeedX(0);
+                }
                 break;
 
             case KeyEvent.VK_LEFT:
                 robot.moveLeft();
+                robot.setMovingLeft(true);
                 break;
 
             case KeyEvent.VK_RIGHT:
                 robot.moveRight();
+                robot.setMovingRight(true);
                 break;
 
             case KeyEvent.VK_SPACE:
                 robot.jump();
                 break;
+
         }
+
     }
 
     @Override
@@ -119,25 +145,35 @@ public class StartingClass extends Applet implements Runnable, KeyListener {
                 break;
 
             case KeyEvent.VK_DOWN:
-                System.out.println("Stop moving down");
+                currentSprite = character;
+                robot.setDucked(false);
                 break;
 
             case KeyEvent.VK_LEFT:
-                robot.stop();
+                robot.stopLeft();
                 break;
 
             case KeyEvent.VK_RIGHT:
-                robot.stop();
+                robot.stopRight();
                 break;
 
             case KeyEvent.VK_SPACE:
-                System.out.println("Stop jumping");
                 break;
+
         }
+
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
 
+    }
+
+    public static Background getBg1() {
+        return bg1;
+    }
+
+    public static Background getBg2() {
+        return bg2;
     }
 }
