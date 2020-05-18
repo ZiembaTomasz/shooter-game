@@ -1,5 +1,5 @@
 package com.ziembatomasz.game;
-import java.awt.Graphics;
+import java.util.ArrayList;
 
 public class Robot {
 
@@ -15,15 +15,17 @@ public class Robot {
     private boolean movingRight = false;
     private boolean ducked = false;
 
-    private static Background bg1 = StartingClass.getBg1();
-    private static Background bg2 = StartingClass.getBg2();
-
     private int speedX = 0;
     private int speedY = 1;
 
-    public void update() {
+    private Background bg1 = StartingClass.getBg1();
+    private Background bg2 = StartingClass.getBg2();
 
+    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
+
+    public void update() {
         // Moves Character or Scrolls Background accordingly.
+
         if (speedX < 0) {
             centerX += speedX;
         }
@@ -55,15 +57,12 @@ public class Robot {
                 speedY = 0;
                 jumped = false;
             }
-
         }
-
         // Prevents going beyond X coordinate of 0
         if (centerX + speedX <= 60) {
             centerX = 61;
         }
     }
-
     public void moveRight() {
         if (ducked == false) {
             speedX = MOVESPEED;
@@ -91,9 +90,11 @@ public class Robot {
             speedX = 0;
         }
 
+
         if (isMovingRight() == false && isMovingLeft() == true) {
             moveLeft();
         }
+
 
         if (isMovingRight() == true && isMovingLeft() == false) {
             moveRight();
@@ -109,6 +110,12 @@ public class Robot {
 
     }
 
+    public void shoot() {
+        Projectile p = new Projectile(centerX + 50, centerY - 25);
+        projectiles.add(p);
+    }
+
+
     public int getCenterX() {
         return centerX;
     }
@@ -117,61 +124,80 @@ public class Robot {
         return centerY;
     }
 
+
     public boolean isJumped() {
         return jumped;
     }
+
 
     public int getSpeedX() {
         return speedX;
     }
 
+
     public int getSpeedY() {
         return speedY;
     }
+
 
     public void setCenterX(int centerX) {
         this.centerX = centerX;
     }
 
+
     public void setCenterY(int centerY) {
         this.centerY = centerY;
     }
+
 
     public void setJumped(boolean jumped) {
         this.jumped = jumped;
     }
 
+
     public void setSpeedX(int speedX) {
         this.speedX = speedX;
     }
+
 
     public void setSpeedY(int speedY) {
         this.speedY = speedY;
     }
 
+
     public boolean isDucked() {
         return ducked;
     }
+
 
     public void setDucked(boolean ducked) {
         this.ducked = ducked;
     }
 
+
     public boolean isMovingRight() {
         return movingRight;
     }
+
 
     public void setMovingRight(boolean movingRight) {
         this.movingRight = movingRight;
     }
 
+
     public boolean isMovingLeft() {
         return movingLeft;
     }
+
 
     public void setMovingLeft(boolean movingLeft) {
         this.movingLeft = movingLeft;
     }
 
-}
 
+    public ArrayList getProjectiles() {
+        return projectiles;
+    }
+
+
+}
